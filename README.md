@@ -9,3 +9,4 @@ Used these tutorials:
 
 * http://www.dototot.com/how-to-write-a-twitter-bot-with-python-and-tweepy/
 * http://www.dototot.com/reply-tweets-python-tweepy-twitter-bot/
+* https://github.com/heinrisch/Tweepy-Streaming
