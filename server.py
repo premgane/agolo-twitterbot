@@ -70,15 +70,29 @@ def appearsInBlacklist(url):
 	return False
 
 
+def convertUrlToArticle(url):
+	return {
+			'type':'article',
+			'metadata':{},
+			'url': url
+			}
+
+def summarize(articles):
+	return 'summary'
+
 def parseTweet(tweet):
 	urls = tweet.urls
 	for urlObject in urls:
 		url = urlObject['expanded_url']
 
+		articles = []
 		if not appearsInBlacklist(url):
-			handle = '@' + tweet.full.get('user', {}).get('screen_name', '')
-			api.update_status(url + ' ' + handle, in_reply_to_status_id = tweet.full['id'])
-			#api.update_status(url)
+			articles.append(convertUrlToArticle(url))	
+
+		print articles
+		summary = summarize(articles)
+		handle = '@' + tweet.full.get('user', {}).get('screen_name', '')
+		api.update_status(summary + ' ' + handle, in_reply_to_status_id = tweet.full['id'])
 
 #Tweet class with all the information we need for this program (Hashtags and the actual tweet text)
 class Tweet:
