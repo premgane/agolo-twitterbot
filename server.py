@@ -8,10 +8,10 @@ parser = SafeConfigParser()
 parser.read('secrets.cfg')
 
 #enter the corresponding information from your Twitter application:
-CONSUMER_KEY = parser.get('bug_tracker', 'CONSUMER_KEY')
-CONSUMER_SECRET = parser.get('bug_tracker', 'CONSUMER_SECRET')
-ACCESS_KEY = parser.get('bug_tracker', 'ACCESS_KEY')
-ACCESS_SECRET = parser.get('bug_tracker', 'ACCESS_SECRET')
+CONSUMER_KEY = parser.get('Twitter', 'CONSUMER_KEY')
+CONSUMER_SECRET = parser.get('Twitter', 'CONSUMER_SECRET')
+ACCESS_KEY = parser.get('Twitter', 'ACCESS_KEY')
+ACCESS_SECRET = parser.get('Twitter', 'ACCESS_SECRET')
 
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
