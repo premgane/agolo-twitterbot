@@ -43,18 +43,13 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 
-# line = "Test tweet!"
-# api.update_status(line)
-
 # Given a string, which is presumably a URL, check whether it appears in the blacklist
 def appearsInBlacklist(url):
 	extracted = tldextract.extract(url)._asdict()
 
-	print extracted
-
-	sub = ''
+	subd = ''
 	if 'subdomain' in extracted:
-		sub = extracted['subdomain']
+		subd = extracted['subdomain']
 
 	dom = ''
 	if 'domain' in extracted:
@@ -64,42 +59,39 @@ def appearsInBlacklist(url):
 	if 'suffix' in extracted:
 		tld = extracted['suffix']
 
-	print "dom" + dom
-	print "subd" + sub
-	print "tld" + tld
-
 	if (dom in BLACKLISTED_SITES
 		or url in BLACKLISTED_SITES
-		or '.'.join([sub, dom, tld]) in BLACKLISTED_SITES
-		or '.'.join([sub, dom]) in BLACKLISTED_SITES
+		or '.'.join([subd, dom, tld]) in BLACKLISTED_SITES
+		or '.'.join([subd, dom]) in BLACKLISTED_SITES
 		or '.'.join([dom, tld]) in BLACKLISTED_SITES
 		or '.'.join([dom]) in BLACKLISTED_SITES):
-		print "Blacklisted!"
 		return True
 
-	print "Not blacklisted!!!"
 	return False
 
 
 def parseTweet(tweet):
-	print tweet.urls
 	urls = tweet.urls
 	for urlObject in urls:
 		url = urlObject['expanded_url']
-		print url
+
 		if not appearsInBlacklist(url):
-			api.update_status(url)
+			handle = '@' + tweet.full.get('user', {}).get('screen_name', '')
+			api.update_status(url + ' ' + handle, in_reply_to_status_id = tweet.full['id'])
+			#api.update_status(url)
 
 #Tweet class with all the information we need for this program (Hashtags and the actual tweet text)
 class Tweet:
 	text = str()
 	hashtags = []
 	urls = []
+	full = {}
 
 	def __init__(self, json):
 		self.text = json.get('text', '')
 		self.hashtags = json.get('entities', {}).get('hashtags', [])
 		self.urls = json.get('entities', {}).get('urls', [])
+		self.full = json
 
 #Basic listener which parses the json, creates a tweet, and sends it to parseTweet
 class TweetListener(StreamListener):
