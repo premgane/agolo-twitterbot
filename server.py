@@ -13,6 +13,7 @@ from tldextract.tldextract import LOG
 from PIL import Image, ImageFont, ImageDraw
 import textwrap
 
+
 # Our name
 BOT_NAME = '@agolobot'
 
@@ -22,6 +23,7 @@ SUMMARY_LENGTH = 5
 # A list of sites never to summarize
 # Needs to be kept synchronized with https://github.com/premgane/agolo-slackbot/blob/master/blacklisted-sites.js
 BLACKLISTED_SITES = set([
+  'gutenberg',
   'agolo.com',
   'youtube',
   'twitter.com',
@@ -105,15 +107,18 @@ def summarize(urls):
 	r = requests.post(AGOLO_URL, data = json.dumps(payload), headers = headers)
 	return r.json()
 
+def unicodeHack(inputText):
+	return ''.join([i if ord(i) < 128 else ' ' for i in inputText])
+
 # Given a summary object response from Agolo, convert to a bullet point list
 def summaryToString(summaryObj):
 	result = []
 	for article in summaryObj['summary']:
 		for sentence in article['sentences']:
-			result.append(sentence)
+			result.append(unicodeHack(sentence))
 
-	print '\n\n'.join(result)
-	return '\n\n'.join(result)
+	print '\n\n'.join(result).encode('utf8')
+	return '\n\n'.join(result).encode('utf8')
 
 
 def textToImage(text):
@@ -125,7 +130,7 @@ def textToImage(text):
 	margin = offset = 40
 	for textLine in text.split('\n'):
 		if textLine.lstrip().rstrip():
-			textLine = u"\u2022" + ' ' + textLine
+			textLine =  '- ' + textLine
 
 		for line in textwrap.wrap(textLine, width=50):
 			draw.text((margin, offset), line, font=font, fill="#111")
@@ -160,6 +165,7 @@ def parseTweet(tweet):
 			title = u"\u201C" + title[:TWITTER_LIMIT - len(handle) - 3] + u"\u201D"
 
 		replyText = title + ' ' + handle
+		replyText = replyText.encode('utf8')
 		print replyText
 		# api.update_status(replyText, in_reply_to_status_id = tweet.full['id'])
 		api.update_with_media(FILENAME, replyText, in_reply_to_status_id = tweet.full['id'])
